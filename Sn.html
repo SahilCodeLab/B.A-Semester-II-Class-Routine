@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1024">
+  <title>BA SEM II Class Timetable</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #3f37c9;
+      --accent: #f72585;
+      --success: #006400;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --current-class: #fff3b0;
+      --current-class-pulse: #ffd60a;
+      --holiday: #7209b7;
+      --whatsapp: #25D366;
+      --glass: rgba(255, 255, 255, 0.2);
+      --glass-border: rgba(255, 255, 255, 0.3);
+      --shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+      --card-bg: #ffffff;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+      padding: 20px;
+      color: var(--dark);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 20px auto;
+      background: var(--card-bg);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+    }
+    
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: white;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      animation: rotate 20s linear infinite;
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .subtitle {
+      font-size: 1rem;
+      opacity: 0.9;
+      font-weight: 300;
+      position: relative;
+      z-index: 1;
+    }
+    
+    .tabs {
+      display: flex;
+      background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+      overflow-x: auto;
+      scrollbar-width: none;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .tabs::-webkit-scrollbar {
+      display: none;
+    }
+    
+    .tab {
+      padding: 16px 28px;
+      cursor: pointer;
+      color: white;
+      font-weight: 500;
+      border-right: 1px solid rgba(255,255,255,0.15);
+      white-space: nowrap;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    
+    .tab:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    .tab.active {
+      background: rgba(0,0,0,0.2);
+      font-weight: 600;
+    }
+    
+    .tab.holiday {
+      background: var(--holiday);
+    }
+    
+    .tab.holiday:hover {
+      background: #6a0dad;
+    }
+    
+    .tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: var(--light);
+    }
+    
+    .tab i {
+      margin-right: 8px;
+      font-size: 0.9em;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 30px;
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .tab-content.active {
+      display: block !important;
+    }
+    
+    .holiday-content {
+      text-align: center;
+      padding: 60px 20px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      margin: 20px 0;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.05);
+    }
+    
+    .holiday-content i {
+      font-size: 3.5rem;
+      color: var(--holiday);
+      margin-bottom: 20px;
+    }
+    
+    .holiday-content h2 {
+      color: var(--holiday);
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+    }
+    
+    .holiday-content p {
+      color: #7f8c8d;
+      font-size: 1.1rem;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .day-title {
+      font-size: 1.7rem;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+    
+    .current-time {
+      background: var(--primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+      white-space: nowrap;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      table-layout: fixed;
+    }
+    
+    th, td {
+      border: 3px solid #f0f0f0;
+      padding: 16px;
+      text-align: center;
+      vertical-align: current;
+      width: 25%; /* Equal width for all columns */
+      min-width: 100px; /* Prevent shrinking */
+    }
+    
+    th {
+      background-color: var(--secondary);
+      color: white;
+      position: sticky;
+      top: 0;
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 0.5px;
+    }
+    
+    tr {
+      transition: all 0.3s ease;
+    }
+    
+    tr:hover {
+      background-color: rgba(67, 97, 238, 0.03);
+    }
+    
+    tr:nth-child(even) {
+      background-color: #fafbff;
+    }
+    
+    tr.current-class {
+      background-color: transparent !important;
+    }
+    
+    .current-class td {
+      background-color: var(--current-class) !important;
+      position: relative;
+      animation: highlightPulse 2s infinite ease-in-out;
+      box-shadow: inset 0 0 0 2px var(--current-class-pulse);
+    }
+    
+    .current-class td:last-child {
+      border-right: 1px solid #f0f0f0;
+    }
+    
+    @keyframes highlightPulse {
+      0% { box-shadow: inset 0 0 0 2px var(--current-class-pulse), 0 0 0 0 rgba(255, 214, 10, 0.4); }
+      70% { box-shadow: inset 0 0 0 2px var(--current-class-pulse), 0 0 0 10px rgba(255, 214, 10, 0); }
+      100% { box-shadow: inset 0 0 0 2px var(--current-class-pulse), 0 0 0 0 rgba(255, 214, 10, 0); }
+    }
+    
+    .current-class td:first-child::before {
+      content: 'NOW';
+      position: absolute;
+      top: -10px;
+      right: 6px;
+      background: var(--accent);
+      color: white;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      box-shadow: 0 3px 8px rgba(247, 37, 133, 0.3);
+      z-index: 1;
+    }
+    
+    .subject-code {
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    
+    .room {
+      color: var(--accent);
+      font-weight: 500;
+    }
+    
+    .teacher {
+      color: var(--success);
+      font-style: italic;
+    }
+    
+    .lunch-break {
+      color: #7f8c8d;
+      font-style: italic;
+      text-align: center;
+      width: 100%;
+    }
+    
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #95a5a6;
+      font-size: 0.9rem;
+      padding: 20px;
+      border-top: 1px solid #eee;
+    }
+    
+    .whatsapp-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: var(--whatsapp);
+      color: white;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      text-align: center;
+      font-size: 30px;
+      box-shadow: 0 6px 20px rgba(37, 211, 102, 0.3);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+    
+    .whatsapp-button:hover {
+      background-color: #128C7E;
+      transform: scale(1.1);
+      box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+    }
+    
+    .whatsapp-button i {
+      margin-top: 2px;
+    }
+    
+    .whatsapp-tooltip {
+      position: absolute;
+      right: 70px;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      font-size: 0.9rem;
+      color: var(--dark);
+    }
+    
+    .whatsapp-button:hover .whatsapp-tooltip {
+      opacity: 1;
+    }
+    
+    .features-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-top: 30px;
+    }
+    
+    .feature-card {
+      flex: 1 1 300px;
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+    
+    .feature-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--secondary);
+    }
+    
+    .feature-desc {
+      color: #6c757d;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+    
+    @media (max-width: 992px) {
+      .container {
+        border-radius: 12px;
+      }
+      
+      .header {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.8rem;
+      }
+      
+      .tab {
+        padding: 14px 22px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      body {
+        padding: 15px;
+      }
+      
+      .container {
+        border-radius: 12px;
+      }
+      
+      .tabs {
+        flex-direction: column;
+      }
+      
+      .tab {
+        border-right: none;
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+        padding: 12px 20px;
+        text-align: center;
+      }
+      
+      .tab.active::after {
+        height: 100%;
+        width: 4px;
+        bottom: auto;
+        left: auto;
+        right: 0;
+      }
+      
+      th, td {
+        padding: 12px 10px;
+        font-size: 0.9rem;
+      }
+      
+      .day-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+      
+      .current-time {
+        margin-top: 0;
+      }
+      
+      .current-class td:first-child::before {
+        width: 35px;
+        height: 35px;
+        font-size: 0.65rem;
+        top: -8px;
+        right: -8px;
+      }
+      
+      .holiday-content {
+        padding: 40px 15px;
+      }
+      
+      .holiday-content i {
+        font-size: 2.5rem;
+      }
+      
+      .whatsapp-button {
+        width: 50px;
+        height: 50px;
+        font-size: 24px;
+        bottom: 20px;
+        right: 20px;
+      }
+      
+      .feature-card {
+        flex: 1 1 100%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      body {
+        padding: 10px;
+      }
+      
+      .header {
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.5rem;
+      }
+      
+      .subtitle {
+        font-size: 0.9rem;
+      }
+      
+      .tab-content {
+        padding: 20px 15px;
+      }
+      
+      table {
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+        min-width: 600px; /* Ensure table doesn't shrink too much */
+      }
+      
+      .whatsapp-tooltip {
+        display: none;
+      }
+      
+      .holiday-content h2 {
+        font-size: 1.5rem;
+      }
+      
+      .holiday-content p {
+        font-size: 1rem;
+      }
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        font-size: 12pt;
+      }
+      
+      .container {
+        box-shadow: none;
+        border-radius: 0;
+        max-width: 100%;
+        margin: 0;
+      }
+      
+      .tabs, .whatsapp-button, .footer {
+        display: none;
+      }
+      
+      .tab-content {
+        display: block !important;
+        padding: 0;
+        page-break-after: always;
+      }
+      
+      table {
+        box-shadow: none;
+      }
+      
+      th {
+        background-color: #ddd !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .current-class td {
+        background-color: #fff3b0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>BA Semester II Class Timetable</h1>
+      <div class="subtitle">Department of Arts • Session 2024-2025</div> <br>
+      <p><strong>Developer:</strong> <span style="color:white;">SahilCodelab</span></p>
+      
+    </div>
+    
+    <div class="tabs">
+      <div class="tab" onclick="showDay('sunday')">
+        <i class="fas fa-calendar-day"></i> Sunday
+      </div>
+      <div class="tab" onclick="showDay('monday')">
+        <i class="fas fa-calendar-day"></i> Monday
+      </div>
+      <div class="tab" onclick="showDay('tuesday')">
+        <i class="fas fa-calendar-day"></i> Tuesday
+      </div>
+      <div class="tab" onclick="showDay('wednesday')">
+        <i class="fas fa-calendar-day"></i> Wednesday
+      </div>
+      <div class="tab" onclick="showDay('thursday')">
+        <i class="fas fa-calendar-day"></i> Thursday
+      </div>
+      <div class="tab" onclick="showDay('friday')">
+        <i class="fas fa-calendar-day"></i> Friday
+      </div>
+      <div class="tab" onclick="showDay('saturday')">
+        <i class="fas fa-calendar-day"></i> Saturday
+      </div>
+    </div>
+    
+    <!-- Sunday -->
+    <div id="sunday" class="tab-content">
+      <div class="day-header">
+        <h2 class="day-title">Sunday</h2>
+        <div class="current-time" id="sunday-time"></div>
+      </div>
+      <div class="holiday-content">
+        <i class="fas fa-umbrella-beach"></i>
+        <h2>Weekend Holiday</h2>
+        <p>No classes scheduled today. Enjoy your day off and prepare for the week ahead!</p>
+      </div>
+    </div>
+    
+    <!-- Monday -->
+    <div id="monday" class="tab-content">
+      <div class="day-header">
+        <h2 class="day-title">Monday</h2>
+        <div class="current-time" id="monday-time"></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Class</th>
+            <th>Room</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10:00 AM - 11:00 AM</td>
+            <td class="subject-code">URDG-MINNOR/CC<br>HING-MINNOR/CC<br>ENGG-MINNOR/CC<br>BNGG-MINNOR/CC</td>
+            <td class="room">R102<br>R205<br>R223<br>R219</td>
+            <td class="teacher">XX<br>XX<br>MK<br>MDR</td>
+          </tr>
+          <tr>
+            <td>11:00 AM- 12:00 PM</td>
+            <td class="subject-code">HISA-MAJOR<br>EDCA-MAJOR<br>EDCA-MAJOR<br>PLSA-MAJOR<br>PHIA-MAJOR<br>JORA-MAJOR<br>HINA-MAJOR<br>ENGA-MAJOR<br>BNGA-MAJOR</td>
+            <td class="room">R207<br>R221<br>R228<br>R203<br>R201<br>R102<br>R209<br>R223<br>R219</td>
+            <td class="teacher">DB<br>JKP<br>SG<br>MGH<br>SB<br>SC<br>XX<br>SG<br>DR</td>
+          </tr>
+          <tr>
+            <td>12:00 PM - 1:00 PM</td>
+            <td class="subject-code">HISA-SEC II<br>EDCA-SEC II<br>SOCA-SEC II<br>PLSA-SEC II<br>PHIA-SEC II<br>JORA-SEC II<br>HINA-SEC II<br>ENGA-SEC II<br>BNGA-SEC II</td>
+            <td class="room">R207<br>R221<br>R228<br>R203<br>R201<br>R102<br>R209<br>R223<br>R219</td>
+            <td class="teacher">DB<br>RA<br>JPC<br>SC<br>SB<br>SC<br>DKS<br>MK<br>DR</td>
+          </tr>
+          <tr>
+            <td>1:00 PM - 2:00 PM</td>
+            <td class="subject-code">PLSG-MINNOR/CC<br>SANG-MINNOR/CC</td>
+            <td class="room">R203<br>R103</td>
+            <td class="teacher">MG<br>MM</td>
+          </tr>
+          <tr>
+            <td>2:00 PM - 3:00 PM</td>
+            <td class="subject-code">HISA-MAJOR<br>EDCA-MAJOR<br>SOCA-MAJOR<br>PLSA-MAJOR<br>JORA-MAJOR<br>HINA-MAJOR<br>ENGA-MAJOR<br>BNGA-MAJOR</td>
+            <td class="room">R207<br>R221<br>R228<br>R203<br>R201<br>R102<br>R209<br>R223<br>R219</td>
+            <td class="teacher">LB<br>IS<br>AC<br>SC<br>TRB<br>ABL<br>BKS<br>Mi<br>AKD</td>
+          </tr>
+          <tr>
+            <td>3:00 PM - 4:00 PM</td>
+            <td class="subject-code">EDCG-MINNOR/CC<br>FMSG-MINNOR/CC</td>
+            <td class="room">R219<br>R204</td>
+            <td class="teacher">SRC<br>DC</td>
+          </tr>
+          <tr>
+            <td>4:00 PM - 5:00 PM</td>
+            <td class="subject-code">PHIG-MINNOR/CC<br>JORG-MINNOR/CC<br>PEDG-MINNOR/CC</td>
+            <td class="room">R201<br>R102<br>R115</td>
+            <td class="teacher">TRB<br>RK<br>BS</td>
+          </tr>
+          <tr>
+            <td>5:00 PM - 6:00 PM</td>
+            <td class="subject-code">SOCA-MDC-2<br>PEDG-MDC-2<br>FMSG-MDC-2</td>
+            <td class="room">R201<br>R115<br>R224</td>
+            <td class="teacher">AC<br>BS<br>DC</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Tuesday -->
+    <div id="tuesday" class="tab-content">
+      <div class="day-header">
+        <h2 class="day-title">Tuesday</h2>
+        <div class="current-time" id="tuesday-time"></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Class</th>
+            <th>Room</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10:00 AM - 11:00 AM</td>
+            <td class="subject-code">HISA-MAJOR<br>EDCA-MAJOR<br>SOCA-MAJOR<br>PLSA-MAJOR<br>PHIA-MAJOR<br>JORA-MAJOR<br>HINA-MAJOR<br>ENGA-MAJOR<br>BNGA-MAJOR<br>ACELG-GEN</td>
+            <td class="room">R207<br>R221<br>R228<br>R203<br>R201<br>R103<br>R209<br>R223<br>R219<br>R127</td>
+            <td class="teacher">SB<br>IS<br>SBD<br>MG<br>DM<br>ABL<br>PM<br>MK<br>MDR<br>XX</td>
+          </tr>
+          <tr>
+            <td>11:00 AM- 12:00 PM</td>
+            <td class="subject-code">HISA-SEC-II(H)<br>EDCA-SEC-II(H)<br>SOCA-SEC-II(H)<br>PLSA-SEC-II(H)<br>PHIA-SEC-II(H)<br>JORA-SEC-II(H)<br>HINA-SEC-II(H)<br>ENGA-SEC-II(H)<br>BNGA-SEC-II(H)</td>
+            <td class="room">R207<br>R221<br>R228<br>R208<br>R201<br>R102<br>R209<br>R223<br>R219</td>
+            <td class="teacher">DS<br>MBM<br>SG<br>CS<br>XX<br>SC<br>PM<br>SB<br>AKD</td>
+          </tr>
+          <tr>
+            <td>12:00 PM - 1:00 PM</td>
+            <td class="subject-code">PLSG-MINOR/CC<br>SANG-MINOR/CC</td>
+            <td class="room">R208<br>R207</td>
+            <td class="teacher">CS<br>MM</td>
+          </tr>
+          <tr>
+            <td>1:00 PM - 2:00 PM</td>
+            <td class="subject-code">BNGG-MINOR/CC<br>ENGG-MINOR/CC<br>HING-MINOR/CC<br>URDG-MINOR/CC<br>PEDG-MINOR(SC)</td>
+            <td class="room">R219<br>R223<br>R209<br>R207<br>R115</td>
+            <td class="teacher">PN<br>RB<br>PM<br>SK<br>BS</td>
+          </tr>
+          <tr>
+            <td>2:00 PM - 3:00 PM</td>
+            <td class="subject-code">AEC-BNG-ARTS<br>AEC-HING<br>AEC-URDU<br>AEC-SANG<br>AEC(SC)</td>
+            <td class="room">R219<br>R209<br>R103<br>XX<br>XX</td>
+            <td class="teacher">PB<br>SP<br>SK<br>DS<br>HP</td>
+          </tr>
+          <tr>
+            <td>3:00 PM - 4:00 PM</td>
+            <td class="subject-code">HISG-MINOR/CC</td>
+            <td class="room">R207</td>
+            <td class="teacher">SB</td>
+          </tr>
+          <tr>
+            <td>4:00 PM - 5:00 PM</td>
+            <td class="subject-code">EDCG-MINOR/CC<br>FMSG-MINOR/CC</td>
+            <td class="room">R221<br>R204</td>
+            <td class="teacher">SS<br>DC</td>
+          </tr>
+          <tr>
+            <td>5:00 PM - 6:00 PM</td>
+            <td class="subject-code">FMSG-MDC<br>SDVA-MDC<br>FMSG-MDC</td>
+               <td class="room">R155<br>R226<br>R304</td>
+            <td class="teacher">BS<br>JPC<br>PG</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    
+    <!-- Wednesday -->
+    <div id="wednesday" class="tab-content">
+      <div class="day-header">
+        <h2 class="day-title">Wednesday</h2>
+        <div class="current-time" id="wednesday-time"></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Class</th>
+            <th>Room</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10:00 AM - 11:00 AM</td>
+            <td class="subject-code">ENGA-MAJOR</td>
+            <td class="room">R225</td>
+            <td class="teacher">MB</td>
+          </tr>
+          <tr>
+            <td>11:00 AM- 12:00 PM</td>
+            <td class="subject-code">HISA-SEC II(H)<br>EDCA-SEC II(H)<br>SOCA-SEC II(H)<br>PLSA-SEC II(H)<br>PHIA-SEC II(H)<br>JORA-SEC II(H)<br>HINA-SEC II(H)<br>ENGA-SEC II(H)<br>BNGA-SEC II(H)</td>
+            <td class="room">R207<br>R221<br>R228<br>R208<br>R201<br>R102<br>R209<br>R223<br>R219</td>
+            <td class="teacher">SB<br>JKP<br>SBD<br>TB<br>DM<br>SRB<br>-<br>MI<br>MDR</td>
+          </tr>
+          <tr>
+            <td>12:00 PM - 1:00 PM</td>
+            <td class="subject-code">HISA-MAJOR-DSC<br>EDCA-MAJOR-DSC<br>SOCA-MAJOR-DSC<br>PLSA-MAJOR-DSC<br>PHIA-MAJOR-DSC<br>JORA-MAJOR-DSC<br>HINA-MAJOR-DSC<br>ENGA-MAJOR-DSC<br>BNGA-MAJOR-DSC</td>
+            <td class="room">R207<br>R221<br>R228<br>R208<br>R201<br>R102<br>R209<br>R223<br>R219</td>
+            <td class="teacher">DS<br>MBM<br>JPC<br>TB<br>DM<br>SRB<br>SP<br>RB<br>PN</td>
+          </tr>
+          <tr>
+            <td>1:00 AM- 12:00 AM</td>
+            <td class="subject-code">PLSG-MINOR/CC<br>SANG-MINOR/CC<br>PEDG-MINOR(SC)</td>
+            <td class="room">R208<br>R207<br>R115</td>
+            <td class="teacher">MG<br>MM<br>JG</td>
+          </tr>
+          <tr>
+            <td>2:00 PM - 3:00 PM</td>
+            <td class="subject-code">PHIG-MINOR/CC<br>JORG-MINOR/CC<br>PEDG-MINOR/CC</td>
+            <td class="room">R201<br>R102<br>R115</td>
+            <td class="teacher">DM<br>PN<br>JG</td>
+          </tr>
+          <tr>
+            <td>3:00 PM - 4:00 PM</td>
+            <td class="subject-code">EDCG-MINOR/CC<br>FMSG-MINOR/CC</td>
+            <td class="room">R222<br>R204</td>
+            <td class="teacher">SS<br>PG</td>
+          </tr>
+          <tr>
+            <td>4:00 PM - 5:00 PM</td>
+            <td class="subject-code">VAC</td>
+            <td class="room">R115</td>
+            <td class="teacher">JG</td>
+          </tr>
+          <tr>
+            <td>5:00 PM - 6:00 PM</td>
+            <td class="subject-code">No Class</td>
+            <td class="room">-</td>
+            <td class="teacher">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Thursday -->
+    <div id="thursday" class="tab-content">
+      <div class="day-header">
+        <h2 class="day-title">Thursday</h2>
+        <div class="current-time" id="thursday-time"></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Class</th>
+            <th>Room</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10:00 AM - 11:00 AM</td>
+            <td class="subject-code">
+EDCG-MINOR/CC <br>
+FMSG-MINOR/CC              
+            </td>
+            <td class="room">
+R221 <br>
+R204              
+            </td>
+            <td class="teacher">
+ SS <br>
+PG 
+            </td>
+          </tr>
+          <tr>
+            <td>11:00 AM- 12:00 PM</td>
+            <td class="subject-code">
+URDG-MINOR/CC <br>
+HING-MINOR/CC <br>
+ENGG-MINOR/CC <br>
+BNGG-MINOR/CC <br>
+SARA-MINOR/CC              
+            </td>
+            <td class="room">
+R207 <br>
+R209 <br>
+R223 <br>
+R219               
+            </td>
+            <td class="teacher">
+SK<br>
+-<br>
+SB <br>
+MDR              
+            </td>
+          </tr>
+          <tr>
+            <td>12:00 PM - 1:00 PM</td>
+            <td class="subject-code">
+HISA-MAJOR <br>
+EDCA-MINOR/CC <br>
+SOCA-MINOR/CC <br>
+PLSA-MINOR/CC <br>
+PHIA-MINOR/CC <br>
+JORA-MINOR/CC <br>
+HINA-MINOR/CC <br>
+ENGA-MINOR/CC <br>
+BNGA-MINOR/CC <br>
+PEDG-MINOR/CC 
+            </td>
+            <td class="room">
+R207 <br>
+R221<br>
+R228<br>
+R208<br>
+R201 <br>
+R102<br>
+R209 <br>
+R223 <br>
+R219<br>
+R115
+            </td>
+            <td class="teacher">
+DB-MINOR/CC <br>
+CS-MINOR/CC <br>
+SG-MINOR/CC <br>
+CS-MINOR/CC <br>
+SB-MINOR/CC <br>
+ABL-MINOR/CC <br>
+SP-MINOR/CC <br>
+SB-MINOR/CC <br>
+PN-MINOR/CC <br>
+JG-MINOR/CC 
+            </td>
+          </tr>
+          <tr>
+            <td>1:00 PM - 2:00 PM</td>
+            <td class="subject-code">
+PHIG-MINOR/CC <br>
+JORA-MINOR/CC-1 <br>
+PEDG-MINOR/CC-1<br>
+            </td>
+            <td class="room">
+R201 <br>
+R102 <br>
+R103
+            </td>
+            <td class="teacher">
+  -<br>
+  PN <br>
+  JG
+            </td>
+          </tr>
+          <tr>
+            <td>2:00 PM - 3:00 PM</td>
+            <td class="subject-code">
+HISG-MINOR/CC
+            </td>
+            <td class="room">R207</td>
+            <td class="teacher">DB</td>
+          </tr>
+          <tr>
+            <td>3:00 PM - 4:00 PM</td>
+            <td class="subject-code">
+EDCG-MINOR/CC <br>
+FMSG-MINOR/CC
+            </td>
+            <td class="room">
+R221 <br>
+R204
+            </td>
+            <td class="teacher">
+SS <br>
+DC
+            </td>
+          </tr>
+          <tr>
+            <td>4:00 PM - 5:00 PM</td>
+            <td class="subject-code">
+ VSC-1             
+            </td>
+            <td class="room">
+R207
+</td>
+            <td class="teacher">
+-
+              </td>
+          </tr>
+          <tr>
+            <td>5:00 PM - 6:00 PM</td>
+            <td class="subject-code">
+PEDG-MDC <br>
+FMSG-MINOR/CC <br>
+SOCA-MINOR/CC 
+            </td>
+            <td class="room">
+R115 <br>
+R224 <br>
+R201
+            </td>
+            <td class="teacher">
+   -<br>
+   DC <br>
+   SG
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Friday -->
+    <div id="friday" class="tab-content">
+      <div class="day-header">
+        <h2 class="day-title">Friday</h2>
+        <div class="current-time" id="friday-time"></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Class</th>
+            <th>Room</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10:00 AM - 11:00 AM</td>
+            <td class="subject-code">
+PLSG-MINOR/CC <br>
+SANG-MINOR/CC 
+            </td>
+            <td class="room">
+R208 <br>
+R209 
+            </td>
+            <td class="teacher">
+SC <br>
+DC
+              </td>
+          </tr>
+          <tr>
+            <td>11:00 AM- 12:00 PM</td>
+            <td class="subject-code">
+BNGG-MINOR/CC-1 <br>
+ENGG-MINOR/CC <br>
+HING-MINOR/CC <br>
+URDG-MINOR/CC 
+            </td>
+            <td class="room">
+R219<br>
+R223<br>
+R209<br>
+R207
+            </td>
+            <td class="teacher">
+DR<br>
+HP<br>
+BKS<br>
+-<br>
+            </td>
+          </tr>
+          <tr>
+            <td>12:00 PM - 1:00 PM</td>
+            <td class="subject-code">
+PHIG-MINOR/CC <br>
+JORG-MINOR/CC <br>
+PEDG-MINOR/CC <br>
+            </td>
+            <td class="room">
+  R201 <br>
+  R102 <br>
+  R115
+  </td>
+            <td class="teacher">
+  TRB <br>
+  PN <br>
+  -
+              </td>
+          </tr>
+          <tr>
+            <td>1:00 PM - 2:00 PM</td>
+            <td class="subject-code">
+HISA-MAJOR <br>
+EDCA-MAJOR <br>
+SOCA-MAJOR <br>
+PLSA-MAJOR <br>
+PHIA-MAJOR <br>
+JORA-MAJOR <br>
+HINA-MAJOR <br>
+ENGA-MAJOR <br>
+BNGA
+            </td>
+            <td class="room">
+R207 <br>
+R221 <br>
+R228 <br>
+R208 <br>
+R201 <br>
+R103 <br>
+R209 <br>
+R223 <br>
+R219
+            </td>
+            <td class="teacher">
+SGD <br>
+JKP <br>
+- <br>
+MGH <br>
+TRB <br>
+SRB <br>
+PM <br>
+SB <br>
+PB
+            </td>
+          </tr>
+          
+          <tr>
+            <td>2:00 PM - 3:00 PM</td>
+            <td class="subject-code">
+BNGG-AEC <br>
+HING-AEC <br>
+BNGG-AEC <br>
+URDG-AEC <br>
+AEC-ENG (Arts & Com)
+            </td>
+            <td class="room">
+R207 <br>
+R223 <br>
+R207 <br>
+- <br>
+-
+            </td>
+            <td class="teacher">
+   PN <br>
+   PM <br>
+   - <br>
+   - <br>
+   SG 
+            </td>
+          </tr>
+          
+          <tr>
+            <td>3:00 PM - 4:00 PM</td>
+            <td class="subject-code">
+HISG-MINOR/CC <br>
+PEDG-MINOR (SC)
+            </td>
+            <td class="room">
+R207 <br>
+R115
+              </td>
+            <td class="teacher">
+ DS <br>
+ JG
+            </td>
+          </tr>
+          <tr>
+            <td>4:00 PM - 5:00 PM</td>
+            <td class="subject-code">
+VAC-1
+            </td>
+            <td class="room">
+R207
+              </td>
+            <td class="teacher">
+BS
+            </td>
+          </tr>
+          <tr>
+            <td>5:00 PM - 6:00 PM</td>
+            <td class="subject-code">No Class</td>
+            <td class="room">-</td>
+            <td class="teacher">-</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Saturday -->
+    <div id="saturday" class="tab-content">
+      <div class="day-header">
+        <h2 class="day-title">Saturday</h2>
+        <div class="current-time" id="saturday-time"></div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Class</th>
+            <th>Room</th>
+            <th>Teacher</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>10:00 AM - 11:00 AM</td>
+            <td class="subject-code">
+HISG-MINOR/CC
+            </td>
+            <td class="room">R207</td>
+            <td class="teacher">SB</td>
+          </tr>
+          <tr>
+            <td>11:00 AM- 12:00 PM</td>
+            <td class="subject-code">
+PLSG-MINNOR/CC <br>
+SANG-MINOR/CC
+            </td>
+            <td class="room">
+R208 <br>
+R20            
+            </td>
+            <td class="teacher">
+CS <br>
+MM
+            </td>
+          </tr>
+          <tr>
+            <td>12:00 PM - 1:00 PM</td>
+            <td class="subject-code">
+URDG-MINOR/CC <br>
+HISG-MINOR/CC<br>
+ENGG-MINOR/CC<br>
+BNGG-MINOR/CC<br>
+PEDG-MINOR/CC              
+            </td>
+            <td class="room">
+R103 <br>
+R209<br>
+R223<br>
+R220<br>
+R115
+            </td>
+            <td class="teacher">
+SK <br>
+-<br>
+MI<br>
+-<br>
+DR<br>
+JR
+            </td>
+          </tr>
+          <tr>
+            <td>1:00 PM - 2:00 PM</td>
+            <td class="subject-code">
+PHIG-MINOR/CC-1 <br>
+JORG-MINOR/CC-1 <br>
+PEDG-MINOR/CC-1 
+            </td>
+            <td class="room">
+R201 <br>
+R207 <br>
+R115
+            </td>
+            <td class="teacher">
+   SB <br>
+   UB <br>
+   BS
+            </td>
+          </tr>
+          <tr>
+            <td>2:00 PM - 3:00 PM</td>
+            <td class="subject-code">
+BNGG-AEC <br>
+AEC-ENG<br>
+HING-AEC<br>
+URDG-AEC<br>
+SANG-AEC
+            </td>
+            <td class="room">
+R219 <br>
+- <br>
+R223 <br>
+- <br>
+- 
+            </td>
+            <td class="teacher">
+ DR <br>
+ - <br>
+ -<br>
+ SK <br>
+ DC
+            </td>
+          </tr>
+          <tr>
+            <td>3:00 PM - 4:00 PM</td>
+            <td class="subject-code">
+ACEL-HONS
+            </td>
+            <td class="room">
+  R127
+              </td>
+            <td class="teacher">
+  -
+              </td>
+          </tr>
+          <tr>
+            <td>4:00 PM - 5:00 PM</td>
+            <td class="subject-code">
+AMGIA-H+G
+            </td>
+            <td class="room">
+  R127            
+            </td>
+            <td class="teacher">
+   -           
+            </td>
+          </tr>
+          <tr>
+            <td>5:00 PM - 6:00 PM</td>
+            <td class="subject-code">
+No class
+            </td>
+            <td class="room">
+  -           
+            </td>
+            <td class="teacher">
+   -           
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <!-- Additional Features Section -->
+    <div class="tab-content features-section" style="display: none; padding: 30px;">
+      <h2 style="color: var(--secondary); margin-bottom: 20px; text-align: center;">Timetable Features</h2>
+      <div class="features-container">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-bell"></i>
+          </div>
+          <h3 class="feature-title">Real-time Updates</h3>
+          <p class="feature-desc">Automatically highlights your current class and shows real-time updates every minute.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3 class="feature-title">Fully Responsive</h3>
+          <p class="feature-desc">Works perfectly on all devices from smartphones to desktops with adaptive layout.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-print"></i>
+          </div>
+          <h3 class="feature-title">Printer Friendly</h3>
+          <p class="feature-desc">Special print styles ensure your timetable looks great when printed.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3 class="feature-title">Group Connect</h3>
+          <p class="feature-desc">Quick access to your class WhatsApp group for easy communication.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <a href="https://chat.whatsapp.com/BTpOdzsygvSA0Ya0wF2hg3" class="whatsapp-button" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+    <span class="whatsapp-tooltip">Join Class WhatsApp Group</span>
+  </a>
+  
+  <div class="footer">
+    <p><i class="fas fa-sync-alt"></i> Auto-updating • <i class="fas fa-bell"></i> Current class highlighted • <i class="fas fa-mobile-alt"></i> Fully Responsive</p>
+    <p>© 2023 BA Semester II Timetable | Department of Arts</p>
+  </div>
+
+  <script>
+
+    // Highlight current class based on time
+function highlightCurrentClass() {
+  // Remove any existing highlights
+  document.querySelectorAll('tr').forEach(row => {
+    row.classList.remove('current-class');
+  });
+
+  const now = new Date();
+  const currentHour = now.getHours();
+  const currentMinute = now.getMinutes();
+  const currentDay = now.getDay(); // 0=Sunday, 1=Monday, etc.
+
+  // Only highlight if viewing today's timetable
+  const activeTab = document.querySelector('.tab.active');
+  if (!activeTab) return;
+
+  const activeDay = activeTab.textContent.toLowerCase().trim();
+  const dayMap = { sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6 };
+
+  if (dayMap[activeDay] === currentDay) {
+    const rows = document.querySelectorAll('.tab-content.active tbody tr');
+
+    rows.forEach(row => {
+      const timeCell = row.cells[0];
+      if (timeCell.textContent.includes('-')) {
+        const [startTime, endTime] = timeCell.textContent.split('-').map(t => t.trim());
+
+        // Parse start time
+        let startHour, startMinute;
+        if (startTime.includes('AM') || startTime.includes('PM')) {
+          const [time, period] = startTime.split(' ');
+          [startHour, startMinute] = time.split(':').map(Number);
+          if (period === 'PM' && startHour !== 12) startHour += 12;
+          if (period === 'AM' && startHour === 12) startHour = 0;
+        } else {
+          [startHour, startMinute] = startTime.split(':').map(Number);
+        }
+
+        // Parse end time
+        let endHour, endMinute;
+        if (endTime.includes('AM') || endTime.includes('PM')) {
+          const [time, period] = endTime.split(' ');
+          [endHour, endMinute] = time.split(':').map(Number);
+          if (period === 'PM' && endHour !== 12) endHour += 12;
+          if (period === 'AM' && endHour === 12) endHour = 0;
+        } else {
+          [endHour, endMinute] = endTime.split(':').map(Number);
+        }
+
+        const currentTotalMinutes = currentHour * 60 + currentMinute;
+        const startTotalMinutes = startHour * 60 + startMinute;
+        const endTotalMinutes = endHour * 60 + endMinute;
+
+        if (currentTotalMinutes >= startTotalMinutes && currentTotalMinutes <= endTotalMinutes) {
+          row.classList.add('current-class');
+          // Smooth scroll to current class
+          setTimeout(() => {
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }, 300);
+        }
+      }
+    });
+  }
+}
+
+// Update current time display
+function updateCurrentTime() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const dateString = now.toLocaleDateString([], { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  const activeTab = document.querySelector('.tab.active');
+
+  if (activeTab) {
+    const activeDay = activeTab.textContent.toLowerCase().trim();
+    const timeElement = document.getElementById(`${activeDay}-time`);
+    if (timeElement) {
+      timeElement.textContent = `${dateString} • ${timeString}`;
+    }
+  }
+}
+
+// Show selected day's content
+function showDay(day) {
+  // Hide all tab contents
+  document.querySelectorAll('.tab-content').forEach(content => {
+    content.classList.remove('active');
+  });
+
+  // Remove active class from all tabs
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.classList.remove('active');
+    tab.classList.remove('holiday');
+  });
+
+  // Show selected day's content
+  document.getElementById(day).classList.add('active');
+
+  // Add active class to clicked tab
+  event.currentTarget.classList.add('active');
+  if (day === 'sunday') {
+    event.currentTarget.classList.add('holiday');
+  }
+
+  // Update current class highlighting
+  highlightCurrentClass();
+  updateCurrentTime();
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function () {
+  // Auto-select today's tab
+  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  const today = new Date().getDay();
+  const todayTab = document.querySelector(`.tab:nth-child(${today + 1})`);
+  if (todayTab) {
+    todayTab.click();
+    if (today === 0) { // Sunday
+      todayTab.classList.add('holiday');
+    }
+  }
+
+  // Initial updates
+  updateCurrentTime();
+  highlightCurrentClass();
+
+  // Set up periodic updates
+  setInterval(() => {
+    updateCurrentTime();
+    highlightCurrentClass();
+  }, 60000); // Update every minute
+
+  // Add animation to features on scroll
+  const featureCards = document.querySelectorAll('.feature-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = 1;
+        entry.target.style.transform = 'translateY(0)';
+      }
+    });
+  }, { threshold: 0.1 });
+
+  featureCards.forEach(card => {
+    card.style.opacity = 0;
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    observer.observe(card);
+  });
+});
+    
+    
+    
+  </script>
+</body>
+</html>
+
+
+
